@@ -1,7 +1,7 @@
 ## Usage
 
 ```
-npm install micro-cli --save-dev
+npm install micro-structure-cli --save-dev
 
 micro init
 ```
