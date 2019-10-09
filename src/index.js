@@ -1,0 +1,64 @@
+#!/usr/bin/env node
+
+const Ora = require('ora')
+const program = require('commander')
+const prompt = require('inquirer').createPromptModule()
+const path = require('path')
+const fs = require('fs')
+const spinner = new Ora()
+const { downloadGit } = require('./utils')
+
+program
+  .version(require('../package').version)
+  .usage('<command> [options]')
+
+program
+  .command('init')
+  .action(async () => {
+    // 选择初始化 主 或 子项目
+    // 主项目需要注入 config 地址
+    const { type } = await prompt({
+      type: 'list',
+      name: 'type',
+      message: '选择你要创建的项目类型',
+      choices: ['主项目', '子项目']
+    })
+
+    const { name } = await prompt({
+      type: 'input',
+      name: 'name',
+      message: '请输入项目名称',
+      validate (val) {
+        return !!val.trim()
+      }
+    })
+
+    let templateUrl = 'https://github.com/micro-structure/child-desc.git'
+    let configUrl
+    if (type === '主项目') {
+      templateUrl = 'https://github.com/micro-structure/parent.git'
+      const res = await prompt({
+        type: 'input',
+        name: 'configUrl',
+        message: '请输入项目配置文件绝对地址',
+        validate (val) {
+          return !!val.trim()
+        }
+      })
+      configUrl = res.configUrl
+    }
+    spinner.start('下载模版')
+    await downloadGit(templateUrl, name)
+    if (configUrl) {
+      const indexPath = path.resolve(process.cwd(), name, 'public', 'index.html')
+      const indexContent = fs.readFileSync(indexPath, 'utf8')
+      const matches = indexContent.replace(/<\!--config path-->([\S\s]+?)<\!--config path-->/, (str, match) => {
+        return '<!--config path-->\n    <script src="'+ configUrl +'"></script>\n    <!--config path-->'
+      })
+      fs.writeFileSync(indexPath, matches, 'utf8')
+    }
+    spinner.succeed('下载模版成功')
+    process.exit(0)
+  })
+
+program.parse(process.argv)
