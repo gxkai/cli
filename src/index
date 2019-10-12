@@ -7,6 +7,8 @@ const path = require('path')
 const fs = require('fs')
 const spinner = new Ora()
 const { downloadGit } = require('./utils')
+const vueTemplateUrl = 'https://github.com/micro-structure/child-desc.git'
+const reactTemplateUrl = 'https://github.com/micro-structure/child-react.git'
 
 program
   .version(require('../package').version)
@@ -20,7 +22,7 @@ program
     const { type } = await prompt({
       type: 'list',
       name: 'type',
-      message: '选择你要创建的项目类型',
+      message: '选择创建的项目类型',
       choices: ['主项目', '子项目']
     })
 
@@ -33,8 +35,8 @@ program
       }
     })
 
-    let templateUrl = 'https://github.com/micro-structure/child-desc.git'
     let configUrl
+    let templateUrl = ''
     if (type === '主项目') {
       templateUrl = 'https://github.com/micro-structure/parent.git'
       const res = await prompt({
@@ -46,6 +48,15 @@ program
         }
       })
       configUrl = res.configUrl
+    } else {
+      // 选择子项目
+      const { childType } = await prompt({
+        type: 'list',
+        name: 'childType',
+        message: '选择模版',
+        choices: ['vue', 'react']
+      })
+      templateUrl = childType === 'vue' ? vueTemplateUrl : reactTemplateUrl
     }
     spinner.start('下载模版')
     await downloadGit(templateUrl, name)
