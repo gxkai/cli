@@ -5,10 +5,12 @@ const program = require('commander')
 const prompt = require('inquirer').createPromptModule()
 const path = require('path')
 const fs = require('fs')
+const { exec } = require('child_process')
 const spinner = new Ora()
 const { downloadGit } = require('./utils')
 const vueTemplateUrl = 'https://github.com/micro-structure/child-desc.git'
 const reactTemplateUrl = 'https://github.com/micro-structure/child-react.git'
+const workDir = process.cwd()
 
 program
   .version(require('../package').version)
@@ -61,7 +63,7 @@ program
     spinner.start('下载模版')
     await downloadGit(templateUrl, name)
     if (configUrl) {
-      const indexPath = path.resolve(process.cwd(), name, 'public', 'index.html')
+      const indexPath = path.resolve(workDir, name, 'public', 'index.html')
       const indexContent = fs.readFileSync(indexPath, 'utf8')
       const matches = indexContent.replace(/<\!--config path-->([\S\s]+?)<\!--config path-->/, (str, match) => {
         return '<!--config path-->\n    <script src="'+ configUrl +'"></script>\n    <!--config path-->'
@@ -70,6 +72,44 @@ program
     }
     spinner.succeed('下载模版成功')
     process.exit(0)
+  })
+
+program
+  .command('print')
+  .action(async () => {
+    const dirs = fs.readdirSync(path.resolve(workDir, 'dist'))
+    const p = ['js', 'css']
+    let names = []
+    const result = {}
+    dirs.forEach(dir => {
+      if (p.includes(dir)) {
+        names = names.concat(fs.readdirSync(path.resolve(workDir, 'dist', dir)))
+      }
+    })
+
+    result.appCss = '/css/' + names.find(x => /^app.*?css$/.test(x))
+    result.chunkCss = '/css/' + names.find(x => /^chunk-vendors.*?css$/.test(x))
+    result.urlPath = '/js/' + names.find(x => /^app.*?js$/.test(x))
+    result.chunkPath = '/js/' + names.find(x => /^chunk-vendors.*?js$/.test(x))
+    console.log(result)
+  })
+
+program
+  .command('prebuild')
+  .action(async () => {
+    exec(`mv ${path.resolve(workDir, 'public')} ${path.resolve(workDir, 'public-tmp')}`, (err) => {
+      if (err)
+        throw err
+    })
+  })
+
+program
+  .command('postbuild')
+  .action(async () => {
+    exec(`mv ${path.resolve(workDir, 'public-tmp')} ${path.resolve(workDir, 'public')}`, (err) => {
+      if (err)
+        throw err
+    })
   })
 
 program.parse(process.argv)
