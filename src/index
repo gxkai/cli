@@ -97,10 +97,10 @@ program
     result.urlPath = names.find(x => /^app.*?js$/.test(x))
     result.chunkPath = names.find(x => /^chunk-vendors.*?js$/.test(x))
 
-    result.appCss += result.appCss ? '/css/' : ''
-    result.chunkCss += result.chunkCss ? '/css/' : ''
-    result.urlPath += result.urlPath ? '/js/' : ''
-    result.chunkPath += result.chunkPath ? '/js/' : ''
+    result.appCss = result.appCss ? `/css/${result.appCss}` : ''
+    result.chunkCss = result.chunkCss ? `/css/${result.chunkCss}` : ''
+    result.urlPath = result.urlPath ? `/js/${result.urlPath}` : ''
+    result.chunkPath = result.chunkPath ? `/js/${result.chunkPath}` : ''
 
     console.log(result)
   })
