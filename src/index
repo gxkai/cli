@@ -92,10 +92,16 @@ program
       }
     })
 
-    result.appCss = '/css/' + names.find(x => /^app.*?css$/.test(x))
-    result.chunkCss = '/css/' + names.find(x => /^chunk-vendors.*?css$/.test(x))
-    result.urlPath = '/js/' + names.find(x => /^app.*?js$/.test(x))
-    result.chunkPath = '/js/' + names.find(x => /^chunk-vendors.*?js$/.test(x))
+    result.appCss = names.find(x => /^app.*?css$/.test(x))
+    result.chunkCss = names.find(x => /^chunk-vendors.*?css$/.test(x))
+    result.urlPath = names.find(x => /^app.*?js$/.test(x))
+    result.chunkPath = names.find(x => /^chunk-vendors.*?js$/.test(x))
+
+    result.appCss += result.appCss ? '/css/' : ''
+    result.chunkCss += result.chunkCss ? '/css/' : ''
+    result.urlPath += result.urlPath ? '/js/' : ''
+    result.chunkPath += result.chunkPath ? '/js/' : ''
+
     console.log(result)
   })
 
