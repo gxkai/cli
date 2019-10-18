@@ -73,7 +73,7 @@ program
     // 修改 chunk-vendors
     const vueConfigPath = path.resolve(workDir, name, 'vue.config.js')
     const vueConfigContent = fs.readFileSync(vueConfigPath, 'utf8')
-    fs.writeFileSync(vueConfigPath, vueConfigContent.replace(`chunk-vendors-${name}`), 'utf8')
+    fs.writeFileSync(vueConfigPath, vueConfigContent.replace('chunk-vendors', `chunk-vendors-${name}`), 'utf8')
 
     spinner.succeed('下载模版成功')
     process.exit(0)
