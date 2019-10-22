@@ -105,7 +105,7 @@ program
 
     spinner.info(JSON.stringify(result, null, 2))
     // 生成 index.js 文件
-    const tpl = fs.readFile(path.resolve(__dirname, 'load.js'), 'utf8')
+    const tpl = fs.readFileSync(path.resolve(__dirname, 'load.js'), 'utf8')
     const targetPath = path.resolve(workDir, 'dist', require(path.resolve(workDir, 'package.json')).version, 'index.js')
     fse.outputFileSync(targetPath, tpl.replace('{{ assetsArr }}', JSON.stringify(result, null, 2)))
 
