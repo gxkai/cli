@@ -107,7 +107,12 @@ program
     // 生成 index.js 文件
     const tpl = fs.readFileSync(path.resolve(__dirname, 'load.js'), 'utf8')
     const targetPath = path.resolve(workDir, 'dist', require(path.resolve(workDir, 'package.json')).version, 'index.js')
-    fse.outputFileSync(targetPath, tpl.replace('{{ assetsArr }}', JSON.stringify(result, null, 2)))
+    fse.outputFileSync(
+      targetPath, 
+      tpl
+        .replace('{{ projectName }}', path.basename(workDir))
+        .replace('{{ assetsArr }}', JSON.stringify(result, null, 2))
+    )
 
     // 提交 git
     spinner.start('文件生成成功，提交改动...')
