@@ -116,8 +116,12 @@ program
 
     // 提交 git
     spinner.start('文件生成成功，提交改动...')
-    execSync('git add . && git commit -m "fix: regenerator index.js" && git push')
-    spinner.succeed('提交成功')
+    execSync('git add .')
+    try {
+      execSync('git commit -m "fix: regenerator index.js" && git push')
+      spinner.succeed('提交成功\n')
+    } catch (e) {
+    }
     spinner.info(targetPath)
   })
 
