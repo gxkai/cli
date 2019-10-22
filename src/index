@@ -5,12 +5,13 @@ const program = require('commander')
 const prompt = require('inquirer').createPromptModule()
 const path = require('path')
 const fs = require('fs')
-const { exec } = require('child_process')
+const { exec, execSync } = require('child_process')
 const spinner = new Ora()
 const { downloadGit } = require('./utils')
 const vueTemplateUrl = 'https://github.com/micro-structure/child-desc.git'
 const reactTemplateUrl = 'https://github.com/micro-structure/child-react.git'
 const workDir = process.cwd()
+const fse = require('fs-extra')
 
 program
   .version(require('../package').version)
@@ -85,24 +86,34 @@ program
     const dirs = fs.readdirSync(path.resolve(workDir, 'dist'))
     const p = ['js', 'css']
     let names = []
-    const result = {}
+    const result = []
     dirs.forEach(dir => {
       if (p.includes(dir)) {
         names = names.concat(fs.readdirSync(path.resolve(workDir, 'dist', dir)))
       }
     })
 
-    result.appCss = names.find(x => /^app.*?css$/.test(x))
-    result.chunkCss = names.find(x => /^chunk-vendors.*?css$/.test(x))
-    result.urlPath = names.find(x => /^app.*?js$/.test(x))
-    result.chunkPath = names.find(x => /^chunk-vendors.*?js$/.test(x))
+    const appCss = names.find(x => /^app.*?css$/.test(x))
+    const chunkCss = names.find(x => /^chunk-vendors.*?css$/.test(x))
+    const urlPath = names.find(x => /^app.*?js$/.test(x))
+    const chunkPath = names.find(x => /^chunk-vendors.*?js$/.test(x))
 
-    result.appCss = result.appCss ? `/css/${result.appCss}` : ''
-    result.chunkCss = result.chunkCss ? `/css/${result.chunkCss}` : ''
-    result.urlPath = result.urlPath ? `/js/${result.urlPath}` : ''
-    result.chunkPath = result.chunkPath ? `/js/${result.chunkPath}` : ''
+    appCss && result.push(`/css/${appCss}`)
+    chunkCss && result.push(`/css/${chunkCss}`)
+    urlPath && result.push(`/js/${urlPath}`)
+    chunkPath && result.push(`/js/${chunkPath}`)
 
-    console.log(result)
+    spinner.info(JSON.stringify(result, null, 2))
+    // 生成 index.js 文件
+    const tpl = fs.readFile(path.resolve(__dirname, 'load.js'), 'utf8')
+    const targetPath = path.resolve(workDir, 'dist', require(path.resolve(workDir, 'package.json')).version, 'index.js')
+    fse.outputFileSync(targetPath, tpl.replace('{{ assetsArr }}', JSON.stringify(result, null, 2)))
+
+    // 提交 git
+    spinner.start('文件生成成功，提交改动...')
+    execSync('git add . && git commit -m "fix: regenerator index.js" && git push')
+    spinner.succeed('提交成功')
+    spinner.info(targetPath)
   })
 
 program
