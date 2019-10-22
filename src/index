@@ -110,7 +110,7 @@ program
     fse.outputFileSync(
       targetPath, 
       tpl
-        .replace('{{ projectName }}', `"${path.basename(workDir)}",`)
+        .replace('{{ projectName }}', `"entry-${path.basename(workDir)}",`)
         .replace('{{ assetsArr }}', JSON.stringify(result, null, 2))
     )
 
