@@ -110,15 +110,16 @@ program
     fse.outputFileSync(
       targetPath, 
       tpl
-        .replace('{{ projectName }}', `${path.basename(workDir)},`)
+        .replace('{{ projectName }}', `"${path.basename(workDir)}",`)
         .replace('{{ assetsArr }}', JSON.stringify(result, null, 2))
     )
 
     // 提交 git
-    spinner.start('文件生成成功，提交改动...')
+    spinner.start('文件生成成功，提交改动...\n')
     execSync('git add .')
     try {
-      execSync('git commit -m "fix: regenerator index.js" && git push')
+      execSync('git commit -m "fix: regenerator index.js"')
+      execSync('git push')
       spinner.succeed('提交成功\n')
     } catch (e) {
     }
