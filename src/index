@@ -82,7 +82,8 @@ program
 
 program
   .command('print')
-  .action(async () => {
+  .option('-n, --noCommit [noCommit]', '只收集依赖，不提交git')
+  .action(async (cmd) => {
     const dirs = fs.readdirSync(path.resolve(workDir, 'dist'))
     const p = ['js', 'css']
     let names = []
@@ -108,22 +109,26 @@ program
     const tpl = fs.readFileSync(path.resolve(__dirname, 'load.js'), 'utf8')
     const targetPath = path.resolve(workDir, 'dist', require(path.resolve(workDir, 'package.json')).version, 'index.js')
     fse.outputFileSync(
-      targetPath, 
+      targetPath,
       tpl
         .replace('{{ projectName }}', `"entry-${path.basename(workDir)}",`)
         .replace('{{ assetsArr }}', JSON.stringify(result, null, 2))
     )
 
-    // 提交 git
-    spinner.start('文件生成成功，提交改动...\n')
-    execSync('git add .')
-    try {
-      execSync('git commit -m "fix: regenerator index.js"')
-      execSync('git push')
-      spinner.succeed('提交成功\n')
-    } catch (e) {
+    if (!cmd.noCommit) {
+      // 提交 git
+      spinner.start('文件生成成功，提交改动...\n')
+      execSync('git add .')
+      try {
+        execSync('git commit -m "fix: regenerator index.js"')
+        execSync('git push')
+        spinner.succeed('提交成功\n')
+      } catch (e) {
+      }
+      spinner.info(targetPath)
+    } else {
+      spinner.succeed(`引用依赖更新成功！${targetPath}`)
     }
-    spinner.info(targetPath)
   })
 
 program
