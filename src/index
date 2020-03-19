@@ -108,7 +108,7 @@ program
     const tsRouterPath = path.resolve(workDir, 'src/routes/config.ts')
     const jsRouterPath = path.resolve(workDir, 'src/routes/config.js')
     let routerFromChild = false
-    let routerFromChildContent = ''
+    let routerFromChildContent = '[]'
     if (fse.pathExistsSync(tsRouterPath)) {
       routerFromChildContent = fs.readFileSync(tsRouterPath, 'utf8')
     } else if (fse.pathExistsSync(jsRouterPath)) {
@@ -118,7 +118,7 @@ program
     if (routerFromChildContent && routerFromChildContent[1]) {
       routerFromChild = true
     } else {
-      routerFromChildContent = ''
+      routerFromChildContent = '[]'
     }
 
     spinner.info(JSON.stringify(result, null, 2))
