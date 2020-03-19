@@ -114,8 +114,8 @@ program
     } else if (fse.pathExistsSync(jsRouterPath)) {
       routerFromChildContent = fs.readFileSync(jsRouterPath, 'utf8')
     }
-    routerFromChildContent = routerFromChildContent.replace('export default ', '')
     if (routerFromChildContent) {
+      routerFromChildContent = routerFromChildContent.replace('export default ', '')
       routerFromChild = true
     } else {
       routerFromChildContent = '[]'
