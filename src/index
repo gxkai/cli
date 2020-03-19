@@ -108,14 +108,14 @@ program
     const tsRouterPath = path.resolve(workDir, 'src/routes/config.ts')
     const jsRouterPath = path.resolve(workDir, 'src/routes/config.js')
     let routerFromChild = false
-    let routerFromChildContent = '[]'
+    let routerFromChildContent
     if (fse.pathExistsSync(tsRouterPath)) {
       routerFromChildContent = fs.readFileSync(tsRouterPath, 'utf8')
     } else if (fse.pathExistsSync(jsRouterPath)) {
       routerFromChildContent = fs.readFileSync(jsRouterPath, 'utf8')
     }
     routerFromChildContent = routerFromChildContent.replace('export default ', '')
-    if (routerFromChildContent && routerFromChildContent[1]) {
+    if (routerFromChildContent) {
       routerFromChild = true
     } else {
       routerFromChildContent = '[]'
