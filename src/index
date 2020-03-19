@@ -114,7 +114,7 @@ program
     } else if (fse.pathExistsSync(jsRouterPath)) {
       routerFromChildContent = fs.readFileSync(jsRouterPath, 'utf8')
     }
-    routerFromChildContent = routerFromChildContent.match(/export default (\[[\s\S]*?\])/)
+    routerFromChildContent = routerFromChildContent.replace('export default ', '')
     if (routerFromChildContent && routerFromChildContent[1]) {
       routerFromChild = true
     } else {
