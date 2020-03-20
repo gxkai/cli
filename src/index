@@ -105,21 +105,21 @@ program
     chunkPath && result.push(`/js/${chunkPath}`)
 
     // 查找路由配置
-    const tsRouterPath = path.resolve(workDir, 'src/routes/config.ts')
-    const jsRouterPath = path.resolve(workDir, 'src/routes/config.js')
+    // const tsRouterPath = path.resolve(workDir, 'src/routes/config.ts')
+    // const jsRouterPath = path.resolve(workDir, 'src/routes/config.js')
     let routerFromChild = false
     let routerFromChildContent
-    if (fse.pathExistsSync(tsRouterPath)) {
-      routerFromChildContent = fs.readFileSync(tsRouterPath, 'utf8')
-    } else if (fse.pathExistsSync(jsRouterPath)) {
-      routerFromChildContent = fs.readFileSync(jsRouterPath, 'utf8')
-    }
-    if (routerFromChildContent) {
-      routerFromChildContent = routerFromChildContent.replace('export default ', '')
-      routerFromChild = true
-    } else {
-      routerFromChildContent = '[]'
-    }
+    // if (fse.pathExistsSync(tsRouterPath)) {
+    //   routerFromChildContent = fs.readFileSync(tsRouterPath, 'utf8')
+    // } else if (fse.pathExistsSync(jsRouterPath)) {
+    //   routerFromChildContent = fs.readFileSync(jsRouterPath, 'utf8')
+    // }
+    // if (routerFromChildContent) {
+    //   routerFromChildContent = routerFromChildContent.replace('export default ', '')
+    //   routerFromChild = true
+    // } else {
+    //   routerFromChildContent = '[]'
+    // }
 
     spinner.info(JSON.stringify(result, null, 2))
     // 生成 index.js 文件
@@ -131,7 +131,7 @@ program
         .replace('{{ projectName }}', `"entry-${path.basename(workDir)}",`)
         .replace('{{ assetsArr }}', JSON.stringify(result, null, 2))
         .replace('{{ routerFromChild }}', String(routerFromChild))
-        .replace('{{ routerFromChildContent }}', routerFromChildContent)
+        .replace('{{ routerFromChildContent }}', routerFromChildContent || '[]')
     )
 
     if (!cmd.noCommit) {
